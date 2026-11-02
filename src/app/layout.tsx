@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Grandfa Farm Cafe & Resort — POS",
-  description: "ระบบขายหน้าร้านสำหรับ Grandfa Farm Cafe & Resort",
-  appleWebApp: { capable: true, title: "Grandfa POS", statusBarStyle: "default" },
+  title: "BurnBaru — POS",
+  description: "ระบบขายหน้าร้านสำหรับ BurnBaru",
+  appleWebApp: { capable: true, title: "BurnBaru POS", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
-  themeColor: "#f5f4ef",
+  themeColor: "#6d0212",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -3,17 +3,17 @@
 @theme {
   --font-sans: "Sukhumvit Set", "Thonburi", "Noto Sans Thai", "Sarabun", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* matcha — สีหลักของแบรนด์ (เขียวหม่น) */
-  --color-matcha-50: #f3f7ee;
-  --color-matcha-100: #e4edd8;
-  --color-matcha-200: #cbdcb3;
-  --color-matcha-300: #aac586;
-  --color-matcha-400: #86a95c;
-  --color-matcha-500: #688f41;
-  --color-matcha-600: #50722f;
-  --color-matcha-700: #3f5a27;
-  --color-matcha-800: #344a24;
-  --color-matcha-900: #2c3e20;
+  /* Brand palette */
+  --color-matcha-50: #fbf3f4;
+  --color-matcha-100: #f5e5e8;
+  --color-matcha-200: #e9cbd1;
+  --color-matcha-300: #d9a3ad;
+  --color-matcha-400: #c47281;
+  --color-matcha-500: #a84355;
+  --color-matcha-600: #85283a;
+  --color-matcha-700: #6d0212;
+  --color-matcha-800: #57030f;
+  --color-matcha-900: #3f030b;
 
   /* สถานะออเดอร์ (ใช้ชุดเดียวกันทั้งระบบ) */
   --color-unpaid: #d97706;     /* ยังไม่ชำระ  — amber */

@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const supabase = await createClient();
   const { data } = await supabase.from("settings").select("shop_name").maybeSingle();
   return (
-    <AppShell employee={{ name: emp.name, role: emp.role }} shopName={(data as { shop_name: string } | null)?.shop_name ?? "Grandfa Farm Cafe & Resort"}>
+    <AppShell employee={{ name: emp.name, role: emp.role }} shopName={(data as { shop_name: string } | null)?.shop_name ?? "BurnBaru"}>
       {children}
     </AppShell>
   );

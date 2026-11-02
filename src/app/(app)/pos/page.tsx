@@ -55,7 +55,7 @@ export default async function PosPage({ searchParams }: { searchParams: Promise<
       productAddons={(pa.data as ProductAddon[]) ?? []}
       discounts={(discounts.data as Discount[]) ?? []}
       customers={customers}
-      settings={st ?? { shop_name: "Grandfa Farm Cafe & Resort", receipt_footer: "", sales_enabled: false, inventory_enabled: false, customers_enabled: false }}
+      settings={st ?? { shop_name: "BurnBaru", receipt_footer: "", sales_enabled: false, inventory_enabled: false, customers_enabled: false }}
       initialOrders={(orders.data as unknown as Order[]) ?? []}
     />
   );

@@ -35,7 +35,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
       </div>
       <article className="rounded-2xl bg-white p-5 text-[14px] shadow print:w-[72mm] print:rounded-none print:p-0 print:shadow-none">
         <header className="text-center">
-          <h1 className="text-base font-bold">{settings?.shop_name ?? "Grandfa Farm Cafe & Resort"}</h1>
+          <h1 className="text-base font-bold text-[#6d0212]">{settings?.shop_name === "Grandfa Farm Cafe & Resort" ? "BurnBaru" : settings?.shop_name ?? "BurnBaru"}</h1>
           <p className="text-xs text-stone-500">ใบเสร็จรับเงิน</p>
         </header>
         <div className="my-3 flex justify-between text-xs text-stone-600">

@@ -102,7 +102,7 @@ export function PosClient(props: PosProps) {
       {/* แถบสถานะกะ */}
       <div className="glass no-print flex min-h-12 shrink-0 flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5">
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold leading-tight">{settings.shop_name}</div>
+          <div className="truncate text-sm font-semibold leading-tight text-[#6d0212]">{settings.shop_name === "Grandfa Farm Cafe & Resort" ? "BurnBaru" : settings.shop_name}</div>
           <div className="truncate text-xs text-stone-500">
             {register?.name ?? "ไม่มีเครื่อง POS"} · พนักงาน: {employee.name}
             {shift && <> · เปิดกะ {formatTime(shift.opened_at)}</>}

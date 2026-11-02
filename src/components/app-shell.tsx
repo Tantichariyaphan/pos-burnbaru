@@ -49,7 +49,7 @@ export function AppShell({
     <div className="flex h-dvh w-full overflow-hidden">
       {/* แถบเมนูด้านข้าง (iPad/เดสก์ท็อป) */}
       <aside className="glass no-print hidden w-[76px] shrink-0 flex-col md:flex">
-        <div className="grid h-14 place-items-center text-2xl" title={shopName}>🍵</div>
+        <div className="grid h-14 place-items-center text-2xl" title={shopName === "Grandfa Farm Cafe & Resort" ? "BurnBaru" : shopName}>🍵</div>
         {nav}
         {account}
       </aside>
@@ -60,7 +60,7 @@ export function AppShell({
           <button onClick={() => setOpen(true)} aria-label="เมนู" className="grid size-11 place-items-center rounded-xl active:bg-stone-200/70">
             <Icon name="menu" />
           </button>
-          <div className="truncate text-sm font-semibold">{shopName}</div>
+          <div className="truncate text-sm font-semibold text-[#6d0212]">{shopName === "Grandfa Farm Cafe & Resort" ? "BurnBaru" : shopName}</div>
           <div className="ml-auto truncate text-xs text-stone-500">{employee.name}</div>
         </header>
         <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
