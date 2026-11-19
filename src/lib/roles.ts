@@ -3,13 +3,14 @@ export type Role = "owner" | "manager" | "cashier";
 export const ROLE_LABEL: Record<Role, string> = { owner: "เจ้าของร้าน", manager: "ผู้จัดการ", cashier: "แคชเชียร์" };
 
 export type Permission =
-  | "pos" | "production" | "production.settings" | "cash" | "customers" | "help"
+  | "pos" | "production" | "production.settings" | "cash" | "customers" | "help" | "members"
   | "orders.refund" | "cash.reverse"
   | "reports" | "products" | "inventory"
   | "employees" | "settings";
 
 const MATRIX: Record<Permission, Role[]> = {
   pos: ["owner", "manager", "cashier"],
+  members: ["owner", "manager"],
   production: ["owner", "manager", "cashier"],
   "production.settings": ["owner", "manager"],
   cash: ["owner", "manager", "cashier"],
@@ -38,6 +39,7 @@ export const NAV: NavItem[] = [
   { href: "/inventory", label: "สต็อก", labelEn: "Inventory", icon: "box", perm: "inventory" },
   { href: "/employees", label: "พนักงาน", labelEn: "Employees", icon: "users", perm: "employees" },
   { href: "/customers", label: "ลูกค้า", labelEn: "Customers", icon: "heart", perm: "customers" },
+  { href: "/members", label: "สมาชิก", labelEn: "Members", icon: "heart", perm: "members" },
   { href: "/cash", label: "เงินเข้า-ออก", labelEn: "Cash & Expenses", icon: "wallet", perm: "cash" },
   { href: "/settings", label: "ตั้งค่า", labelEn: "Settings", icon: "gear", perm: "settings" },
   { href: "/help", label: "ช่วยเหลือ", labelEn: "Help", icon: "help", perm: "help" },

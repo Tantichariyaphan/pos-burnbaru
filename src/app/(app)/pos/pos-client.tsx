@@ -25,6 +25,7 @@ import { setQty, removeLine, toggleAddon } from "@/lib/cart";
 
 export interface PosProps {
   denied: boolean;
+  membershipEnabled: boolean;
   loadError: string | null;
   employee: { id: string; name: string; role: string };
   register: Register | null;
@@ -205,6 +206,7 @@ export function PosClient(props: PosProps) {
           open={checkoutOpen} onClose={() => setCheckoutOpen(false)}
           shiftId={shift.id} cart={cart} totals={totals} discount={discount} orders={orders}
           customers={settings.customers_enabled ? props.customers : null}
+          membershipEnabled={props.membershipEnabled}
           onPaid={() => { clearOrder(); void refreshOrders(); }}
         />
       )}

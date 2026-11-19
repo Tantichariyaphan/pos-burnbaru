@@ -29,6 +29,10 @@ echo "• run tests/queue.test.sql"
 "${PSQL[@]}" -f tests/queue.test.sql
 echo "• concurrency: ส่ง checkout ด้วย idempotency key เดียวกันพร้อมกัน"
 bash tests/concurrency.sh "$URL"
+echo "• run tests/membership.test.sql"
+"${PSQL[@]}" -f tests/membership.test.sql
+echo "• concurrency: สมาชิก (คูปอง/แลกแต้ม/Claim token)"
+bash tests/membership_concurrency.sh "$URL"
 echo "• concurrency: คิว/สถานี/รอบอบ หลายเครื่องพร้อมกัน"
 bash tests/queue_concurrency.sh "$URL"
 echo "✅ DB tests passed"

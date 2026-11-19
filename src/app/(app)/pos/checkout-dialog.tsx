@@ -6,25 +6,29 @@ import { Icon } from "@/components/icons";
 import { QrCode } from "@/components/qr-code";
 import { Button, Modal, NumPad, Notice, cn, inputCls, newKey } from "@/components/ui";
 import { bahtToSatang, calcChange, formatBaht, quickCashAmounts } from "@/lib/money";
-import { lineTotal, toCheckoutItems, type CartDiscount, type CartLine, type CartTotals } from "@/lib/cart";
+import { cartTotals, lineTotal, toCheckoutItems, type CartDiscount, type CartLine, type CartTotals } from "@/lib/cart";
 import { formatOrderNo } from "@/lib/order-status";
 import { formatQueueNo, queueUrl } from "@/lib/production";
 import { satangToInput } from "@/lib/queries";
-import type { Customer, Order } from "@/types/db";
+import type { Customer, MemberSummary, Order } from "@/types/db";
+import { MemberPicker } from "./member-picker";
+import { MemberResult } from "./member-result";
 
 type Method = "cash" | "transfer";
 
 export function CheckoutDialog({
-  open, onClose, shiftId, cart, totals, discount, orders, customers, onPaid,
+  open, onClose, shiftId, cart, totals: baseTotals, discount, orders, customers, membershipEnabled, onPaid,
 }: {
   open: boolean; onClose: () => void; shiftId: string; cart: CartLine[]; totals: CartTotals;
-  discount: CartDiscount | null; orders: Order[]; customers: Customer[] | null; onPaid: () => void;
+  discount: CartDiscount | null; orders: Order[]; customers: Customer[] | null; membershipEnabled: boolean; onPaid: () => void;
 }) {
   const [method, setMethod] = useState<Method>("cash");
   const [received, setReceived] = useState("");
   const [reference, setReference] = useState("");
   const [confirmedTransfer, setConfirmedTransfer] = useState(false);
   const [customerId, setCustomerId] = useState("");
+  const [member, setMember] = useState<MemberSummary | null>(null);
+  const [couponId, setCouponId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ orderId: string; change: number; method: Method; total: number; queue: { queueNo: number; token: string } | null } | null>(null);
@@ -36,10 +40,16 @@ export function CheckoutDialog({
     if (open) {
       keyRef.current = newKey();
       setMethod("cash"); setReceived(""); setReference(""); setConfirmedTransfer(false);
-      setCustomerId(""); setError(null); setResult(null); setSubmitting(false); lock.current = false;
+      setCustomerId(""); setMember(null); setCouponId(null); setError(null); setResult(null); setSubmitting(false); lock.current = false;
     }
   }, [open]);
 
+  // คูปองส่วนลดของสมาชิกใช้แทนส่วนลดของร้าน (ฐานข้อมูลตรวจซ้ำและปฏิเสธถ้าใช้ซ้อนกัน) — ตัวเลขนี้เป็นการแสดงผล ยอดจริงคำนวณที่เซิร์ฟเวอร์
+  const coupon = member?.coupons.find((c) => c.id === couponId && c.discount) ?? null;
+  const totals = coupon?.discount
+    ? cartTotals(cart, { id: coupon.id, name: coupon.title, kind: coupon.discount.kind, value: coupon.discount.value })
+    : baseTotals;
+  const activeDiscount = coupon?.discount ? { id: coupon.id, name: coupon.title } : discount;
   const total = totals.total;
   const receivedSatang = method === "cash" ? bahtToSatang(received) : total;
   const change = method === "cash" && receivedSatang !== null ? calcChange(receivedSatang, total) : 0;
@@ -55,9 +65,10 @@ export function CheckoutDialog({
     try {
       const r = await checkout({
         idempotencyKey: keyRef.current, shiftId, items: toCheckoutItems(cart),
-        discountId: discount?.id ?? null, method, receivedSatang,
+        discountId: coupon ? null : discount?.id ?? null, method, receivedSatang,
         reference: method === "transfer" ? reference.trim() || null : null,
-        customerId: customerId || null,
+        customerId: (membershipEnabled ? member?.member.customer_id : customerId) || null,
+        memberCouponId: coupon?.id ?? null,
       });
       if (!r.ok) { setError(r.error); lock.current = false; return; }
       setResult({ orderId: r.data!.orderId, change, method, total, queue: r.data!.queue ?? null });
@@ -107,6 +118,7 @@ export function CheckoutDialog({
               <QrCode value={queueUrl(typeof window === "undefined" ? "" : window.location.origin, result.queue.token)} size={132} label="QR ติดตามคิว" />
             </div>
           )}
+          <MemberResult orderId={result.orderId} enabled={membershipEnabled} />
         </div>
       </Modal>
     );
@@ -146,7 +158,7 @@ export function CheckoutDialog({
             {totals.discount > 0 && (
               <>
                 <div className="flex justify-between"><dt>รวมรายการ</dt><dd className="tnum">{formatBaht(totals.subtotal)}</dd></div>
-                <div className="flex justify-between text-paid"><dt>ส่วนลด {discount?.name}</dt><dd className="tnum">−{formatBaht(totals.discount)}</dd></div>
+                <div className="flex justify-between text-paid"><dt>ส่วนลด {activeDiscount?.name}</dt><dd className="tnum">−{formatBaht(totals.discount)}</dd></div>
               </>
             )}
             <div className="flex items-baseline justify-between border-t border-stone-300 pt-2">
@@ -154,7 +166,13 @@ export function CheckoutDialog({
               <dd className="tnum text-4xl font-bold text-matcha-800">{formatBaht(total)}</dd>
             </div>
           </dl>
-          {customers && customers.length > 0 && (
+          {membershipEnabled && (
+            <MemberPicker
+              cart={cart} netSatang={total} grossSatang={baseTotals.subtotal} hasManualDiscount={!!discount}
+              summary={member} onSummary={setMember} couponId={couponId} onCoupon={setCouponId} disabled={submitting}
+            />
+          )}
+          {!membershipEnabled && customers && customers.length > 0 && (
             <label className="mt-4 block text-sm">
               <span className="mb-1 block font-medium text-stone-700">ลูกค้า (ไม่บังคับ)</span>
               <select className={inputCls} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>

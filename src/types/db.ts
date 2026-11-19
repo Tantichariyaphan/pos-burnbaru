@@ -42,3 +42,23 @@ export interface CashMovement {
 }
 export interface InventoryItem { id: string; name: string; unit: string; qty_on_hand: number; low_stock_level: number; active: boolean }
 export interface StockMovement { id: string; inventory_item_id: string; kind: string; qty_delta: number; note: string | null; created_at: string }
+
+// ---- สมาชิก (migration 0005) ----
+export type Json = Record<string, unknown>;
+export interface MemberCard {
+  customer_id: string; member_no: string; name: string; phone: string | null; birthday: string | null;
+  tier_code: string | null; tier_name: string | null; points: number; stamps: number; stamps_lifetime: number;
+  joined_at: string; last_purchase_at: string | null; marketing_consent: boolean; privacy_accepted: boolean;
+  active: boolean; has_line: boolean;
+}
+export interface MemberCouponChoice {
+  id: string; code: string; title: string; expires_at: string; usable: boolean; min_spend_satang: number | null;
+  discount: { name: string; kind: DiscountKind; value: number } | null;
+}
+export interface MemberSummary {
+  member: MemberCard; enabled: boolean; points_enabled: boolean;
+  preview: { basis_satang: number; points: number; stamps: number };
+  tier: { current?: { code: string; name: string }; next?: { name: string; remaining_satang: number } | null } & Json;
+  stamps: { enabled: boolean; balance: number; per_reward: number };
+  coupons: MemberCouponChoice[];
+}

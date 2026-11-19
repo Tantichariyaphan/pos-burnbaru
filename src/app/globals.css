@@ -3,6 +3,14 @@
 @theme {
   --font-sans: "Sukhumvit Set", "Thonburi", "Noto Sans Thai", "Sarabun", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
+  /* BURN BARU brand tokens (ใช้กับ LIFF/สมาชิก) */
+  --color-bb-burgundy: #710d22;
+  --color-bb-butter: #fff0cc;
+  --color-bb-cream: #fff5e8;
+  --color-bb-caramel: #763c0e;
+  --color-bb-gold: #d99a45;
+  --color-bb-espresso: #26140f;
+
   /* Brand palette */
   --color-matcha-50: #fbf3f4;
   --color-matcha-100: #f5e5e8;

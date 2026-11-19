@@ -41,6 +41,9 @@ export default async function PosPage({ searchParams }: { searchParams: Promise<
     customers = (data as Customer[]) ?? [];
   }
 
+  const { data: loyalty } = await supabase.from("loyalty_settings").select("membership_enabled").maybeSingle();
+  const membershipEnabled = (loyalty as { membership_enabled: boolean } | null)?.membership_enabled ?? false;
+
   const loadError = [cats, prods, orders, settings].find((r) => r.error)?.error?.message;
 
   // ระบบคิว/ผลิต (ส่วนเสริม): อ่านไม่ได้ (เช่น ยังไม่ apply migration 0004) → POS ทำงานแบบเดิม
@@ -72,6 +75,7 @@ export default async function PosPage({ searchParams }: { searchParams: Promise<
       productAddons={(pa.data as ProductAddon[]) ?? []}
       discounts={(discounts.data as Discount[]) ?? []}
       customers={customers}
+      membershipEnabled={membershipEnabled}
       settings={st ?? { shop_name: "Grandfa Farm Cafe & Resort", receipt_footer: "", sales_enabled: false, inventory_enabled: false, customers_enabled: false }}
       initialOrders={orderList.map((o) => ({ ...o, queue: queues[o.id] ?? null }))}
       routes={routes}

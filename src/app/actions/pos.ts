@@ -1,7 +1,9 @@
 "use server";
+import { after } from "next/server";
 import { z } from "zod";
 import { authorize, db, fail, failText, type ActionResult } from "@/lib/actions";
 import type { ShiftSummary } from "@/lib/shift";
+import { flushOutboxSoon } from "@/lib/outbox-flush";
 
 const uuid = z.string().uuid();
 const satang = z.number().int().min(0).max(1_000_000_000);
@@ -53,6 +55,7 @@ const checkoutSchema = z.object({
   receivedSatang: z.number().int().positive().max(1_000_000_000),
   reference: z.string().trim().max(100).nullable().optional(),
   customerId: uuid.nullable().optional(),
+  memberCouponId: uuid.nullable().optional(),
 });
 
 /** ชำระเงิน: ราคา/ส่วนลด/ยอดรวมคำนวณใหม่ที่ฐานข้อมูล; ส่ง key เดิมซ้ำจะได้ออเดอร์เดิม ไม่ตัดเงินซ้ำ */
@@ -63,13 +66,23 @@ export async function checkout(input: z.infer<typeof checkoutSchema>): Promise<A
   if (!p.success) return failText("ข้อมูลออเดอร์ไม่ถูกต้อง");
   const v = p.data;
   const supabase = await db();
-  const { data, error } = await supabase.rpc("checkout_order", {
-    p_idempotency_key: v.idempotencyKey, p_shift_id: v.shiftId, p_items: v.items, p_discount_id: v.discountId,
-    p_method: v.method, p_received_satang: v.receivedSatang, p_reference: v.reference ?? null,
-    p_customer_id: v.customerId ?? null, p_note: null,
-  });
+  // ไม่มีสมาชิก/คูปอง = เส้นทางเดิมของ POS ไม่เปลี่ยน; มีสมาชิกหรือคูปอง = checkout_member_order (ครอบ checkout_order เดิม)
+  const useMember = !!(v.memberCouponId || v.customerId);
+  const { data, error } = useMember
+    ? await supabase.rpc("checkout_member_order", {
+        p_idempotency_key: v.idempotencyKey, p_shift_id: v.shiftId, p_items: v.items, p_discount_id: v.discountId,
+        p_method: v.method, p_received_satang: v.receivedSatang, p_reference: v.reference ?? null,
+        p_customer_id: v.customerId ?? null, p_note: null, p_member_coupon_id: v.memberCouponId ?? null,
+      })
+    : await supabase.rpc("checkout_order", {
+        p_idempotency_key: v.idempotencyKey, p_shift_id: v.shiftId, p_items: v.items, p_discount_id: v.discountId,
+        p_method: v.method, p_received_satang: v.receivedSatang, p_reference: v.reference ?? null,
+        p_customer_id: v.customerId ?? null, p_note: null,
+      });
   if (error) return fail(error.message);
   const orderId = data as string;
+  // ส่งแจ้งเตือน LINE หลังตอบพนักงานแล้ว — ความล้มเหลวของการแจ้งเตือนไม่กระทบการขาย (cron จะส่งซ้ำ)
+  if (useMember) after(flushOutboxSoon);
   // คิวถูกสร้างโดย trigger ตอนบันทึกการชำระเงินอยู่แล้ว — ตรงนี้ "ยืนยัน/ซ่อม" แบบ idempotent และดึงเลขคิว+token สำหรับ QR
   // (ถ้าล้มเหลวหรือยังไม่ได้ apply migration 0004: การขายสำเร็จตามปกติ แค่ไม่มี QR)
   let queue: { queueNo: number; token: string } | null = null;
