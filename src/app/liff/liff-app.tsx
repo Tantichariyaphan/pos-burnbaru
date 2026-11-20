@@ -169,7 +169,9 @@ function ClaimOrRegister({ api, claim, linked, onDone }: { api: CallApi; claim: 
     setBusy(true); setErr(null);
     const r = await api("register", { name, phone, birthday: birthday || null, privacy, marketing });
     setBusy(false);
-    if (r.success) await onDone("ยินดีต้อนรับสู่ BURN BARU CLUB 🔥"); else setErr(r.message ?? "สมัครไม่สำเร็จ");
+    if (r.success) await onDone("ยินดีต้อนรับสู่ BURN BARU CLUB 🔥");
+    else if (r.code === "PHONE_ALREADY_MEMBER" || r.code === "PHONE_EXISTS_ASK_STAFF") setErr("เบอร์นี้มีในระบบของร้านแล้ว แต่ยังไม่ได้ผูกกับ LINE นี้ กรุณาแจ้งพนักงานที่เคาน์เตอร์ ให้แสดง QR ผูก LINE แล้วสแกนด้วยกล้อง LINE ค่ะ");
+    else setErr(r.message ?? "สมัครไม่สำเร็จ");
   };
 
   if (!needForm) return <p className="py-24 text-center">กำลังตรวจสอบ QR…{err && <span className="mt-3 block text-bb-burgundy">{err}</span>}</p>;

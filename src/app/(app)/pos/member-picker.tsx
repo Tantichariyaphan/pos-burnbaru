@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { findMember, memberByQr, memberSummary, registerMember } from "@/app/actions/members";
+import { ClaimQr } from "@/components/claim-qr";
 import { Button, Field, Notice, cn, inputCls } from "@/components/ui";
 import { formatBaht } from "@/lib/money";
 import type { CartLine } from "@/lib/cart";
@@ -71,6 +72,7 @@ export function MemberPicker({
           </div>
           <Button size="sm" onClick={clear} disabled={disabled}>เปลี่ยน</Button>
         </div>
+        {!m.has_line && <ClaimQr purpose="link" customerId={m.customer_id} label="QR ผูกบัญชี LINE (ให้ลูกค้าสแกน)" />}
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-stone-700">
           {summary.points_enabled && <span>แต้มสะสม <b className="tnum">{m.points}</b></span>}
           {summary.stamps.enabled && <span>แสตมป์ <b className="tnum">{summary.stamps.balance}/{summary.stamps.per_reward}</b></span>}

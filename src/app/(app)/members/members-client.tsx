@@ -1,4 +1,5 @@
 "use client";
+import { ClaimQr } from "@/components/claim-qr";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -161,6 +162,7 @@ function MemberDetail({ id, templates }: { id: string; templates: Template[] }) 
         <div className="mt-1"><b className="tnum">{m.points}</b> แต้ม · <b className="tnum">{m.stamps}</b> แสตมป์ (ตลอดชีพ {m.stamps_lifetime})</div>
         <div className="mt-2 flex flex-wrap gap-2">
           {m.has_line && <Button size="sm" disabled={pending} onClick={() => { const r = window.prompt("เหตุผลที่เลิกผูก LINE (เช่น ลูกค้าเปลี่ยนบัญชี)"); if (r) run(() => unlinkLine({ customerId: id, reason: r }), "เลิกผูกแล้ว"); }}>เลิกผูก LINE</Button>}
+          {!m.has_line && <ClaimQr purpose="link" customerId={id} label="QR ผูกบัญชี LINE" />}
           <Button size="sm" disabled={pending} onClick={() => { if (window.confirm("หมุน QR สมาชิก? QR เก่าทั้งหมดจะใช้ไม่ได้")) run(() => rotateMemberQr(id), "หมุน QR แล้ว"); }}>หมุน QR</Button>
         </div>
       </div>
